@@ -93,7 +93,7 @@ namespace ariel {
             }
 
             bool isLeaf() const {
-                return _current->_children[0] == nullptr;
+                return _current->_left_most == nullptr;
             }
 
             bool hasLeft() {
@@ -187,17 +187,26 @@ namespace ariel {
             }
 
             void DfsScan_Next() {
-                if (isLeaf()) {
+                if(_current == nullptr){
+                    return;
+                }
+                else if(isRoot()){
                     oneUp();
-                    if (hasRight()) {
-                        oneRight();
-                    } else {
+                }
+                else if(isLeaf() && isRightMost()){
+                    oneUp();
+                } else if(isLeaf() && !isRightMost()){
+                    oneUp();
+                    oneRight();
+                    goDownLeft();
+                } else{
+                    if(isRightMost()){
+                        oneUp();
+                    }else{
                         oneUp();
                         oneRight();
+                        goDownLeft();
                     }
-                } else {
-                    oneUp();
-                    goDownLeft();
                 }
             }
 
@@ -250,7 +259,7 @@ namespace ariel {
                         case Traversal::PreOrder:
                             break;
                         case Traversal::DFS:
-                            goDownLeftAndRight();
+                            goDownLeft();
                             break;
                         case Traversal::BFS:
                             break;
@@ -488,6 +497,14 @@ namespace ariel {
             }
             out << endl << "* Postorder -> ";
             for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
+                out << (*it) << " ";
+            }
+            out << endl << "* Bfs -> ";
+            for(auto it = BT.begin_bfs_scan(); it != BT.end_bfs_scan(); ++it) {
+                out << (*it) << " ";
+            }
+            out << endl << "* Dfs -> ";
+            for(auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
                 out << (*it) << " ";
             }
             return out;
