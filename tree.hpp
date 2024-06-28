@@ -8,6 +8,7 @@
 #include <map>
 #include <vector>
 #include <cmath>
+#include <queue>
 //#include "Node.hpp"
 using std::vector;
 using std::ostream;
@@ -78,7 +79,21 @@ namespace ariel {
             Traversal _traversal = Traversal::InOrder;
             shared_ptr<Node<T>> _current;
 
+
         private:
+            queue<shared_ptr<Node<T>>> stack;
+            void traverseLeft(std::shared_ptr<Node<T>> node) {
+                while (node) {
+                    stack.push(node);
+                    node = node->_left_most;
+                }
+                if (!stack.empty()) {
+                    _current = stack.front();
+                    stack.pop();
+                } else {
+                    _current = nullptr;
+                }
+            }
             bool isRoot() const {
                 auto parent = _current->_parent;
                 return !parent.owner_before(weak_ptr<Node<T>>{}) && !weak_ptr<Node<T>>{}.owner_before(parent);
@@ -387,6 +402,14 @@ namespace ariel {
             _treeSize++;
             return *this;
         }
+        void myHeap() {
+            std::vector<T> elements;
+            inOrderTraversal(_root, elements);
+            std::make_heap(elements.begin(), elements.end(), std::greater<T>());
+
+            // Reconstruct the tree from heap-ordered elements
+            rebuildFromHeap(_root, elements);
+        }
 
         Iterator begin_pre_order() const {
             auto itr = Iterator{_root, Traversal::PreOrder};
@@ -458,8 +481,27 @@ namespace ariel {
             return *this;
         }
 
-        static ostream &
-        buildTreeStream(const std::string &prefix, shared_ptr<Node<T>> node, bool isLeft, ostream &treeStream) {
+        void inOrderTraversal(std::shared_ptr<Node<T>> node, std::vector<T>& elements) {
+            if (!node) return;
+            inOrderTraversal(node->_left_most, elements);
+            elements.push_back(node->_val);
+            inOrderTraversal(node->_right_most, elements);
+        }
+
+        // Helper function to rebuild tree from heap-ordered elements
+        void rebuildFromHeap(std::shared_ptr<Node<T>>& node, std::vector<T>& elements) {
+            if (!node) return;
+
+            // Set current node value to the top of heap and pop_heap to remove it
+            node->_val = elements.front();
+            std::pop_heap(elements.begin(), elements.end(), std::greater<T>());
+            elements.pop_back();
+
+            // Recursively rebuild left and right subtrees
+            rebuildFromHeap(node->_left_most, elements);
+            rebuildFromHeap(node->_right_most, elements);
+        }
+        static ostream &buildTreeStream(const std::string &prefix, shared_ptr<Node<T>> node, bool isLeft, ostream &treeStream) {
             if (node != nullptr) {
                 treeStream << prefix;
 
@@ -509,6 +551,34 @@ namespace ariel {
             }
             return out;
         }
+
+//        friend std::ostream &operator<<(std::ostream &out, const Tree<T> &BT) {
+//            out << std::endl;
+//            buildTreeStream(BT._root, "", false, out);
+//            out << "                  ----BINARY TREE----" << std::endl;
+//            out << std::endl << "* Inorder   -> ";
+//            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            out << std::endl;
+//            return out;
+//        }
+//        static std::ostream &buildTreeStream(std::shared_ptr<Node<T>> node, const std::string &prefix,
+//                                             bool isLeft, std::ostream &treeStream) {
+//            if (node != nullptr) {
+//                treeStream << prefix;
+//                if (isLeft) {
+//                    treeStream << "├──";
+//                } else {
+//                    treeStream << "└──";
+//                }
+//                treeStream << "(" << node->_val << ")" << std::endl;
+//
+//                buildTreeStream(node->_left_most, prefix + (isLeft ? "│   " : "    "), true, treeStream);
+//                buildTreeStream(node->_right_most, prefix + (isLeft ? "│   " : "    "), false, treeStream);
+//            }
+//            return treeStream;
+//        }
     };
 
 };
