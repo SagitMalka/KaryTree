@@ -81,7 +81,8 @@ namespace ariel {
 
 
         private:
-            queue<shared_ptr<Node<T>>> stack;
+            queue <shared_ptr<Node<T>>> stack;
+
             void traverseLeft(std::shared_ptr<Node<T>> node) {
                 while (node) {
                     stack.push(node);
@@ -94,6 +95,12 @@ namespace ariel {
                     _current = nullptr;
                 }
             }
+
+            bool isOnlyChild() const {
+                return !isRoot() && _current->_parent.lock()->_children_count == 1;
+                //return !isRoot() && isRightMost() && isLeftMost();
+            }
+
             bool isRoot() const {
                 auto parent = _current->_parent;
                 return !parent.owner_before(weak_ptr<Node<T>>{}) && !weak_ptr<Node<T>>{}.owner_before(parent);
@@ -133,15 +140,21 @@ namespace ariel {
                         oneRight();
                     }
 
-                } while (hasLeft() || hasRight());
+                } while (_current && (hasLeft() || hasRight()));
             }
 
             void oneRight() {
-                _current = _current->_right_most;
+                if (hasRight()) {
+                    _current = _current->_right_most;
+                }
             }
 
             void oneLeft() {
-                _current = _current->_left_most;
+                if (hasLeft()) {
+                    _current = _current->_left_most;
+                } else {
+                    _current = nullptr;
+                }
             }
 
             void oneUp() {
@@ -202,25 +215,27 @@ namespace ariel {
             }
 
             void DfsScan_Next() {
-                if(_current == nullptr){
+                if (_current == nullptr) {
                     return;
-                }
-                else if(isRoot()){
+                } else if (isRoot()) {
                     oneUp();
-                }
-                else if(isLeaf() && isRightMost()){
+                } else if (isOnlyChild()) {
                     oneUp();
-                } else if(isLeaf() && !isRightMost()){
-                    oneUp();
-                    oneRight();
-                    goDownLeft();
-                } else{
-                    if(isRightMost()){
+                } else {
+                    if (isLeaf() && isRightMost()) {
                         oneUp();
-                    }else{
+                    } else if (isLeaf() && !isRightMost()) {
                         oneUp();
                         oneRight();
                         goDownLeft();
+                    } else {
+                        if (isRightMost()) {
+                            oneUp();
+                        } else {
+                            oneUp();
+                            oneRight();
+                            goDownLeft();
+                        }
                     }
                 }
             }
@@ -314,6 +329,14 @@ namespace ariel {
             bool operator!=(const Iterator &other) const {
                 return !(*this == other);
             }
+//            static void temp(Node<T> node) {
+//                _current = node;
+//                if(isLeftMost()){
+//                    cout << "left most : yes" << endl;
+//                }if(isRightMost()){
+//                    cout << "right most : yes" << endl;
+//                }
+//            }
 
         };
 
@@ -330,7 +353,7 @@ namespace ariel {
             }
         }
 
-        explicit Tree() : _root(nullptr), _k(2) , _treeSize(0){}
+        explicit Tree() : _root(nullptr), _k(2), _treeSize(0) {}
 
         explicit Tree(T root_value, int kids) : _k(kids) {
             this->_root = make_shared<Node<T>>(root_value);
@@ -344,6 +367,11 @@ namespace ariel {
                 _root = make_shared<Node<T>>(other._root->_val);
                 copySubTreeOf(other._root);
             }
+        }
+
+        void tempcheck(T val) {
+            auto n = getNode(val);
+            Iterator::temp(n);
         }
 
         shared_ptr<Node<T>> getNode(T val) {
@@ -394,14 +422,16 @@ namespace ariel {
 
             updateDepth((parent->_children[kids]));
             parent->_children[kids]->_val = child_val;
-            if(kids == 0){
+            if (kids == 0) {
                 parent->_left_most = parent->_children[kids];
-            } else if(kids == _k -1){
+                //parent->_right_most = parent->_children[kids];
+            } else if (kids == _k - 1) {
                 parent->_right_most = parent->_children[kids];
             }
             _treeSize++;
             return *this;
         }
+
         void myHeap() {
             std::vector<T> elements;
             inOrderTraversal(_root, elements);
@@ -481,7 +511,7 @@ namespace ariel {
             return *this;
         }
 
-        void inOrderTraversal(std::shared_ptr<Node<T>> node, std::vector<T>& elements) {
+        void inOrderTraversal(std::shared_ptr<Node<T>> node, std::vector<T> &elements) {
             if (!node) return;
             inOrderTraversal(node->_left_most, elements);
             elements.push_back(node->_val);
@@ -489,7 +519,7 @@ namespace ariel {
         }
 
         // Helper function to rebuild tree from heap-ordered elements
-        void rebuildFromHeap(std::shared_ptr<Node<T>>& node, std::vector<T>& elements) {
+        void rebuildFromHeap(std::shared_ptr<Node<T>> &node, std::vector<T> &elements) {
             if (!node) return;
 
             // Set current node value to the top of heap and pop_heap to remove it
@@ -501,84 +531,91 @@ namespace ariel {
             rebuildFromHeap(node->_left_most, elements);
             rebuildFromHeap(node->_right_most, elements);
         }
-        static ostream &buildTreeStream(const std::string &prefix, shared_ptr<Node<T>> node, bool isLeft, ostream &treeStream) {
-            if (node != nullptr) {
-                treeStream << prefix;
 
-                string yellowLeft = "\x1B[93m├──\033[0m";
-                string blueRight = "\x1B[34m└──\033[0m";
-                treeStream << (isLeft ? yellowLeft : blueRight);
-
-                treeStream << "\033[3;43;30m(" << node->_val << ")\033[0m" << endl;
-
-                string yellowBranch = "\x1B[93m│   \033[0m";
-                string blueBranch = "\x1B[34m│   \033[0m";
-                buildTreeStream(prefix + (isLeft ? yellowBranch : "    "), node->_left_most, true, treeStream);
-                buildTreeStream(prefix + (isLeft ? blueBranch : "    "), node->_right_most, false, treeStream);
-            }
-            return treeStream;
-        }
-
-        static ostream &buildTreeStream(shared_ptr<Node<T>> node, ostream &treeStream) {
-            return buildTreeStream("", node, false, treeStream) << endl;
-        }
-
-        friend ostream &operator<<(ostream &out, const Tree<T> &BT) {
-            out << endl;
-
-            buildTreeStream(BT._root, out);
-
-            out << "                  ----BINARY TREE----" << endl << endl << "* Preorder  -> ";
-
-            for (auto it = BT.begin_pre_order(); it != BT.end_pre_order(); ++it) {
-                out << (*it) << " ";
-            }
-            out << endl << "* Inorder   -> ";
-            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
-                out << (*it) << " ";
-            }
-            out << endl << "* Postorder -> ";
-            for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
-                out << (*it) << " ";
-            }
-            out << endl << "* Bfs -> ";
-            for(auto it = BT.begin_bfs_scan(); it != BT.end_bfs_scan(); ++it) {
-                out << (*it) << " ";
-            }
-            out << endl << "* Dfs -> ";
-            for(auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
-                out << (*it) << " ";
-            }
-            return out;
-        }
-
-//        friend std::ostream &operator<<(std::ostream &out, const Tree<T> &BT) {
-//            out << std::endl;
-//            buildTreeStream(BT._root, "", false, out);
-//            out << "                  ----BINARY TREE----" << std::endl;
-//            out << std::endl << "* Inorder   -> ";
-//            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
-//                out << (*it) << " ";
-//            }
-//            out << std::endl;
-//            return out;
-//        }
-//        static std::ostream &buildTreeStream(std::shared_ptr<Node<T>> node, const std::string &prefix,
-//                                             bool isLeft, std::ostream &treeStream) {
+//        static ostream &
+//        buildTreeStream(const std::string &prefix, shared_ptr<Node<T>> node, bool isLeft, ostream &treeStream) {
 //            if (node != nullptr) {
 //                treeStream << prefix;
-//                if (isLeft) {
-//                    treeStream << "├──";
-//                } else {
-//                    treeStream << "└──";
-//                }
-//                treeStream << "(" << node->_val << ")" << std::endl;
 //
-//                buildTreeStream(node->_left_most, prefix + (isLeft ? "│   " : "    "), true, treeStream);
-//                buildTreeStream(node->_right_most, prefix + (isLeft ? "│   " : "    "), false, treeStream);
+//                string yellowLeft = "\x1B[93m├──\033[0m";
+//                string blueRight = "\x1B[34m└──\033[0m";
+//                treeStream << (isLeft ? yellowLeft : blueRight);
+//
+//                treeStream << "\033[3;43;30m(" << node->_val << ")\033[0m" << endl;
+//
+//                string yellowBranch = "\x1B[93m│   \033[0m";
+//                string blueBranch = "\x1B[34m│   \033[0m";
+//                buildTreeStream(prefix + (isLeft ? yellowBranch : "    "), node->_left_most, true, treeStream);
+//                buildTreeStream(prefix + (isLeft ? blueBranch : "    "), node->_right_most, false, treeStream);
 //            }
 //            return treeStream;
 //        }
+
+//        static ostream &buildTreeStream(shared_ptr<Node<T>> node, ostream &treeStream) {
+//            return buildTreeStream("", node, false, treeStream) << endl;
+//        }
+//
+//        friend ostream &operator<<(ostream &out, const Tree<T> &BT) {
+//            out << endl;
+//
+//            buildTreeStream(BT._root, out);
+//
+//            out << "                  ----BINARY TREE----" << endl << endl << "* Preorder  -> ";
+//
+//            for (auto it = BT.begin_pre_order(); it != BT.end_pre_order(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            out << endl << "* Inorder   -> ";
+//            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            out << endl << "* Postorder -> ";
+//            for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            out << endl << "* Bfs -> ";
+//            for (auto it = BT.begin_bfs_scan(); it != BT.end_bfs_scan(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            out << endl << "* Dfs -> ";
+//            for (auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
+//                out << (*it) << " ";
+//            }
+//            return out;
+//        }
+
+        friend std::ostream &operator<<(std::ostream &out, const Tree<T> &BT) {
+            out << std::endl;
+            buildTreeStream(BT._root, "", false, out);
+            out << "                  ----BINARY TREE----" << std::endl;
+            out << std::endl << "* Inorder   -> ";
+            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+                out << (*it) << " ";
+            }
+            out << std::endl << "* dfs   -> ";
+            for (auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
+                out << (*it) << " ";
+            }
+            out << std::endl;
+            return out;
+        }
+
+        static std::ostream &buildTreeStream(std::shared_ptr<Node<T>> node, const std::string &prefix,
+                                             bool isLeft, std::ostream &treeStream) {
+            if (node != nullptr) {
+                treeStream << prefix;
+                if (isLeft) {
+                    treeStream << "├──";
+                } else {
+                    treeStream << "└──";
+                }
+                treeStream << "(" << node->_val << ")" << std::endl;
+
+                buildTreeStream(node->_left_most, prefix + (isLeft ? "│   " : "    "), true, treeStream);
+                buildTreeStream(node->_right_most, prefix + (isLeft ? "│   " : "    "), false, treeStream);
+            }
+            return treeStream;
+        }
     };
 
 };
