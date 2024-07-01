@@ -20,19 +20,20 @@ using std::out_of_range;
 using std::queue;
 
 namespace ariel {
-    template<typename T>
+    template<typename T, int k =2>
     class Node {
     public:
         T _val;
-        vector<shared_ptr<Node>> _children;
+        vector<shared_ptr<Node<T, k>>> _children;
         weak_ptr<Node> _parent;
         int _depth;
         int _children_count;
         shared_ptr<Node> _left_most;
         shared_ptr<Node> _right_most;
 
+        //Node(T val) : _val(val), _children(k, nullptr) {}
         explicit Node(T value)
-                : _val(value), _depth(0), _children_count(0), _left_most(nullptr), _right_most(nullptr) {}
+            : _val(value), _children(k, nullptr), _depth(0), _children_count(0), _left_most(nullptr), _right_most(nullptr) {}
 
 //        explicit Node(T &&value) noexcept: _val(value), _children({nullptr}), _depth(0), _children_count(0){
 //            _parent = make_shared<Node<T>>();
@@ -57,11 +58,11 @@ namespace ariel {
         }
     };
 
-    template<typename T>
+    template<typename T, int k =2>
     class Tree {
     private:
-        shared_ptr<Node<T>> _root;
-        int _k;
+        shared_ptr<Node<T, k>> _root;
+        //int _k;
         int _maxDepth = 0;
         int _treeSize = 0;
 
@@ -71,6 +72,38 @@ namespace ariel {
         }; // traversal types
 
     public:
+        //template <T>
+        Tree<T> &add_sub_node(T parent_val, T child_val) {
+            auto parent = getNode(parent_val);
+            if (parent == nullptr) {
+                throw invalid_argument("Parent not found");
+            }
+            int kids = parent->_children_count;
+            if (kids == k) {
+                throw invalid_argument("max kids. cant");
+            }
+            //parent->_children[parent->number_of_children] = make_shared<Node>(child_val);
+            weak_ptr<Node<T>> weakPtr = parent;
+            parent->_children.push_back(make_shared<Node<T>>(child_val));
+            //parent->_children[kids] = make_shared<Node<T>>(child_val);
+
+
+            parent->_children[kids]->_parent = weakPtr;
+
+            parent->_children_count++;
+
+            updateDepth((parent->_children[kids]));
+            parent->_children[kids]->_val = child_val;
+            if (kids == 0) {
+                parent->_left_most = parent->_children[kids];
+                //parent->_right_most = parent->_children[kids];
+            } else if (kids == k - 1) {
+                parent->_right_most = parent->_children[kids];
+            }
+            _treeSize++;
+            return *this;
+        }
+
         class Iterator {
             Traversal _traversal = Traversal::InOrder;
             shared_ptr<Node<T>> _current;
@@ -292,6 +325,9 @@ namespace ariel {
                     }
                 }
             }
+            int getKSize() const{
+                return k;
+            }
 
             shared_ptr<Node<T>> &getCurr() {
                 return _current;
@@ -325,14 +361,6 @@ namespace ariel {
             bool operator!=(const Iterator &other) const {
                 return !(*this == other);
             }
-//            static void temp(Node<T> node) {
-//                _current = node;
-//                if(isLeftMost()){
-//                    cout << "left most : yes" << endl;
-//                }if(isRightMost()){
-//                    cout << "right most : yes" << endl;
-//                }
-//            }
 
         };
 
@@ -349,10 +377,11 @@ namespace ariel {
             }
         }
 
-        explicit Tree() : _root(nullptr), _k(2), _treeSize(0) {}
+        //explicit Tree(T t, int kids) : _root(nullptr), _treeSize(0) {}
+        explicit Tree() : _root(nullptr), _treeSize(0) {}
 
-        explicit Tree(T root_value, int kids) : _k(kids) {
-            this->_root = make_shared<Node<T>>(root_value);
+        explicit Tree(T root_value, int kids) {
+            this->_root = make_shared<Node<T>>(root_value, kids);
             _treeSize = 1;
         }
 
@@ -388,7 +417,7 @@ namespace ariel {
 
         Tree<T> &add_root(const T &val) {
             if (!_root) {
-                _root = make_shared<Node<T>>(val);
+                _root = make_shared<Node<T, k>>(val);
                 _root->_depth = 0;
                 _treeSize++;
             } else {
@@ -399,36 +428,6 @@ namespace ariel {
 
         shared_ptr<Node<T>> getRoot() const {
             return _root;
-        }
-        Tree<T> &add_sub_node(T parent_val, T child_val) {
-            auto parent = getNode(parent_val);
-            if (parent == nullptr) {
-                throw invalid_argument("Parent not found");
-            }
-            int kids = parent->_children_count;
-            if (kids == _k) {
-                throw invalid_argument("max kids. cant");
-            }
-            //parent->_children[parent->number_of_children] = make_shared<Node>(child_val);
-            weak_ptr<Node<T>> weakPtr = parent;
-            parent->_children.push_back(make_shared<Node<T>>(child_val));
-            //parent->_children[kids] = make_shared<Node<T>>(child_val);
-
-
-            parent->_children[kids]->_parent = weakPtr;
-
-            parent->_children_count++;
-
-            updateDepth((parent->_children[kids]));
-            parent->_children[kids]->_val = child_val;
-            if (kids == 0) {
-                parent->_left_most = parent->_children[kids];
-                //parent->_right_most = parent->_children[kids];
-            } else if (kids == _k - 1) {
-                parent->_right_most = parent->_children[kids];
-            }
-            _treeSize++;
-            return *this;
         }
 
         void myHeap() {
@@ -583,38 +582,38 @@ namespace ariel {
 //            return out;
 //        }
 
-        friend std::ostream &operator<<(std::ostream &out, const Tree<T> &BT) {
-            out << std::endl;
-            buildTreeStream(BT._root, "", false, out);
-            out << "                  ----BINARY TREE----" << std::endl;
-            out << std::endl << "* Inorder   -> ";
-            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
-                out << (*it) << " ";
-            }
-            out << std::endl << "* dfs   -> ";
-            for (auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
-                out << (*it) << " ";
-            }
-            out << std::endl;
-            return out;
-        }
+        // friend std::ostream &operator<<(std::ostream &out, const Tree<T> &BT) {
+        //     out << std::endl;
+        //     buildTreeStream(BT._root, "", false, out);
+        //     out << "                  ----BINARY TREE----" << std::endl;
+        //     out << std::endl << "* Inorder   -> ";
+        //     for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+        //         out << (*it) << " ";
+        //     }
+        //     out << std::endl << "* dfs   -> ";
+        //     for (auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
+        //         out << (*it) << " ";
+        //     }
+        //     out << std::endl;
+        //     return out;
+        // }
 
-        static std::ostream &buildTreeStream(std::shared_ptr<Node<T>> node, const std::string &prefix,
-                                             bool isLeft, std::ostream &treeStream) {
-            if (node != nullptr) {
-                treeStream << prefix;
-                if (isLeft) {
-                    treeStream << "├──";
-                } else {
-                    treeStream << "└──";
-                }
-                treeStream << "(" << node->_val << ")" << std::endl;
+        // static std::ostream &buildTreeStream(std::shared_ptr<Node<T>> node, const std::string &prefix,
+        //                                      bool isLeft, std::ostream &treeStream) {
+        //     if (node != nullptr) {
+        //         treeStream << prefix;
+        //         if (isLeft) {
+        //             treeStream << "├──";
+        //         } else {
+        //             treeStream << "└──";
+        //         }
+        //         treeStream << "(" << node->_val << ")" << std::endl;
 
-                buildTreeStream(node->_left_most, prefix + (isLeft ? "│   " : "    "), true, treeStream);
-                buildTreeStream(node->_right_most, prefix + (isLeft ? "│   " : "    "), false, treeStream);
-            }
-            return treeStream;
-        }
+        //         buildTreeStream(node->_left_most, prefix + (isLeft ? "│   " : "    "), true, treeStream);
+        //         buildTreeStream(node->_right_most, prefix + (isLeft ? "│   " : "    "), false, treeStream);
+        //     }
+        //     return treeStream;
+        // }
     };
 
 };

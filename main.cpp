@@ -1,7 +1,7 @@
-#include "mainwindow.h"
+#include "mainwindow.hpp"
 
 #include <QApplication>
-
+using namespace ariel;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
