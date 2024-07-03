@@ -19,6 +19,7 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    Tree<Complex, 5> tree;
 
 protected:
     // template <typename T, int k>
@@ -26,7 +27,7 @@ protected:
 
 private:
     Ui::MainWindow *ui;
-    Tree<Complex, 5> tree;
+
 
     template<typename T>
     QString toQString(const T& value);

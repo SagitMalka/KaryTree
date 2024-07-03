@@ -320,6 +320,7 @@ public:
         explicit Iterator(shared_ptr<Node> curr = nullptr, Traversal type = Traversal::InOrder) : _current(curr),
             _traversal(
                 type) {
+
             if (_current) {
                 switch (type) {
                 case Traversal::InOrder:
@@ -614,18 +615,21 @@ public:
 
         buildTreeStream(BT._root, out);
 
-        out << "                  ----BINARY TREE----" << endl << endl << "* Preorder  -> ";
+        out << "                  ----BINARY TREE----" << endl;
+        if(k == 2){
+            out << endl << "* Preorder  -> ";
 
-        for (auto it = BT.begin_pre_order(); it != BT.end_pre_order(); ++it) {
-            out << (*it) << " ";
-        }
-        out << endl << "* Inorder   -> ";
-        for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
-            out << (*it) << " ";
-        }
-        out << endl << "* Postorder -> ";
-        for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
-            out << (*it) << " ";
+            for (auto it = BT.begin_pre_order(); it != BT.end_pre_order(); ++it) {
+                out << (*it) << " ";
+            }
+            out << endl << "* Inorder   -> ";
+            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+                out << (*it) << " ";
+            }
+            out << endl << "* Postorder -> ";
+            for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
+                out << (*it) << " ";
+            }
         }
         out << endl << "* Bfs -> ";
         for (auto it = BT.begin_bfs_scan(); it != BT.end_bfs_scan(); ++it) {
