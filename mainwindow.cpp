@@ -25,12 +25,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow() {
     delete ui;
 }
-
 template<typename T>
 QString MainWindow::toQString(const T& value) {
-    std::stringstream ss;
-    ss << value;
-    return QString::fromStdString(ss.str());
+    return QString::fromStdString(std::to_string(value));
 }
 
 template<>
@@ -40,25 +37,23 @@ QString MainWindow::toQString<std::string>(const std::string& value) {
 
 template<>
 QString MainWindow::toQString<char>(const char& value) {
-    return QString(QChar(value));
+    return QString(value);
 }
 
-// template<>
-// QString MainWindow::toQString<Complex>(const Complex& value) {
-//     return QString::fromStdString(value.toString());
-// }
 template<>
 QString MainWindow::toQString<Complex>(const Complex& value) {
     return QString("(%1, %2)").arg(value.re()).arg(value.im());
 }
-template <typename T, int k>
 void MainWindow::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
     QPainter painter(this);
-    int dx = width() / 4;  // Horizontal distance between nodes
-    int dy = 50;           // Vertical distance between nodes
-    drawNode(painter, tree.getRoot(), width() / 2, 50, dx, dy);
+    int xOffset = width() / 6;
+    int yOffset = 50;
+
+    if (tree.getRoot() != nullptr) {
+        drawNode(painter, tree.getRoot(), width() / 2, yOffset, xOffset, yOffset);
+    }
 }
 // template <typename T, int k>
 // void MainWindow::drawNode(QPainter &painter, std::shared_ptr<Node> node, int x, int y, int dx, int dy) {
@@ -96,7 +91,7 @@ void MainWindow::drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 3>::N
     }
 
     painter.setBrush(Qt::yellow);
-    painter.drawEllipse(x - 15, y - 15, 30, 30);
+    painter.drawEllipse(x - 15, y - 15, 45, 30);
 
     painter.drawText(x - 10, y + 5, toQString(node->_val));
 

@@ -20,8 +20,8 @@ public:
     ~MainWindow();
 
 protected:
-    template <typename T, int k>
-    void paintEvent(QPaintEvent *event) ;
+    //template <typename T, int k>
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     Ui::MainWindow *ui;
