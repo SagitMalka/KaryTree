@@ -30,19 +30,8 @@ private:
     template<typename T>
     QString toQString(const T& value);
 
-    template<>
-    QString toQString<string>(const string& value);
-
-    template<>
-    QString toQString<char>(const char& value);
-
-    template<>
-    QString toQString<Complex>(const Complex& value);
-
      void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 3>::Node> node, int x, int y, int xOffset, int yOffset);
-    //void drawNode(QPainter &painter, std::shared_ptr<Node<Complex>> node, int x, int y, int dx, int dy);
-    // template <>
-    // void drawNode(QPainter &painter, const std::shared_ptr<Node> node, int x, int y, int dx, int dy);
+
 };
 
 #endif // MAINWINDOW_H
