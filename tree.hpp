@@ -340,9 +340,6 @@ public:
             }
         }
 
-        int getKSize() const {
-            return k;
-        }
 
         shared_ptr<Node> &getCurr() {
             return _current;
@@ -487,7 +484,9 @@ public:
     shared_ptr<Node> getRoot() const {
         return _root;
     }
-
+    int getKSize() const {
+        return k;
+    }
     void myHeap() {
         std::vector<T> elements;
         inOrderTraversal(_root, elements);

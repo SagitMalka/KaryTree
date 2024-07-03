@@ -20,17 +20,18 @@ public:
     ~MainWindow();
 
 protected:
-    //template <typename T, int k>
-    void paintEvent(QPaintEvent *event) override;
+    // template <typename T, int k>
+    void paintEvent(QPaintEvent *event);
 
 private:
     Ui::MainWindow *ui;
-    Tree<Complex, 3> tree;
+    Tree<Complex, 5> tree;
 
     template<typename T>
     QString toQString(const T& value);
 
-     void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 3>::Node> node, int x, int y, int xOffset, int yOffset);
+    // template <typename T, int k>
+    void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 5>::Node>, int x, int y, int xOffset, int yOffset);
 
 };
 
