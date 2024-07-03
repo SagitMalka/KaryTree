@@ -1,11 +1,12 @@
+#include <ui_mainwindow.h>
+
 #include "mainwindow.hpp"
-#include "ui_mainwindow.h"
 #include <sstream>
+
 
 using namespace ariel;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-
     // Example tree
 
     Complex c1(1.0, 2.0);
@@ -75,3 +76,4 @@ void MainWindow::drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 5>::N
         }
     }
 }
+

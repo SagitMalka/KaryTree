@@ -6,11 +6,12 @@
 #include <QString>
 #include "tree.hpp"
 #include "Complex.hpp"
+
+
 using namespace ariel;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -32,7 +33,6 @@ private:
 
     // template <typename T, int k>
     void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 5>::Node>, int x, int y, int xOffset, int yOffset);
-
 };
 
 #endif // MAINWINDOW_H
