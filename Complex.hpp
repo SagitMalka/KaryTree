@@ -1,7 +1,7 @@
 #include <iostream>
 #include <tuple>
 using namespace std;
-//namespace ariel {
+namespace ariel {
 class Complex {
 
 private:
@@ -141,4 +141,4 @@ bool operator>(const Complex& other) const {
 
     //-------------------------------------
 }; // end of class Complex
-//}
+}

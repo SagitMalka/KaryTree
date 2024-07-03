@@ -2,7 +2,7 @@
 #include <sstream>
 using namespace std;
 
-//namespace ariel {
+namespace ariel {
 
 //----------------------------------------
 // method operators
@@ -117,4 +117,4 @@ istream& operator>> (istream& input, Complex& c) {
 //     return input.str();
 // }
 
-//}
+}
