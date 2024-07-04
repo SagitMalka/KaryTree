@@ -15,7 +15,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     Complex c4(8.0, 5.0);
     Complex c5(9.0, 5.0);
     Complex c6(6.0, 6.0);
-    tree.add_root(c1).add_sub_node(c1, c2).add_sub_node(c1, c3).add_sub_node(c1, c4).add_sub_node(c1, c5).add_sub_node(c1, c6);
+    tree.add_root(c1).add_sub_node(c1, c2).add_sub_node(c1, c3);
+    tree.add_sub_node(c2, c4).add_sub_node(c2, c5).add_sub_node(c3, c6);
     //tree.add_root(10).add_sub_node(10, 5).add_sub_node(10, 15).add_sub_node(5, 3).add_sub_node(5, 7);
     //tree.myHeap();
     // tree.insert(10);

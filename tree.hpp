@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include <queue>
-
+#include <stack>
+#include <unordered_set>
 using std::vector;
 using std::ostream;
 using std::invalid_argument;
@@ -19,8 +20,8 @@ using std::endl;
 using std::out_of_range;
 using std::queue;
 using std::array;
-//using std::array;
-
+using std::stack;
+using std::unordered_set;
 namespace ariel {
 template<typename T, int k = 2>
 
@@ -67,12 +68,14 @@ private:
 
 public:
     class Iterator {
-        Traversal _traversal = Traversal::InOrder;
+        Traversal _traversal = Traversal::BFS;
         shared_ptr<Node> _current;
 
 
     private:
         queue<shared_ptr<Node>> _queue;
+        std::stack<shared_ptr<Node>> _stack;
+        unordered_set<shared_ptr<Node>> _visitStack;
         //
         //            void traverseLeft(std::shared_ptr<Node> node) {
         //                while (node) {
@@ -211,30 +214,28 @@ public:
         }
 
         void DfsScan_Next() {
-            if (_current == nullptr) {
-                return;
-            } else if (isRoot()) {
-                oneUp();
-            } else if (isOnlyChild()) {
-                oneUp();
-            } else {
-                if (isLeaf() && isRightMost()) {
-                    oneUp();
-                } else if (isLeaf() && !isRightMost()) {
-                    oneUp();
-                    oneRight();
-                    goDownLeft();
-                } else {
-                    if (isRightMost()) {
-                        oneUp();
-                    } else {
-                        oneUp();
-                        oneRight();
-                        goDownLeft();
+            while (!_stack.empty()) {
+                _current = _stack.top();
+
+                // Check if all children are visited
+                bool allChildrenVisited = true;
+                for (int i = k - 1; i >= 0; --i) {
+                    if (_current->_children[i] && _visitStack.find(_current->_children[i]) == _visitStack.end()) {
+                        _stack.push(_current->_children[i]);
+                        allChildrenVisited = false;
                     }
                 }
+
+                if (allChildrenVisited) {
+                    _visitStack.insert(_current);
+                    _stack.pop();
+                    return;
+                }
             }
+            _current = nullptr;
+
         }
+
 
         void Bfs_Next() {
             //                if (_current == nullptr) {
@@ -317,7 +318,7 @@ public:
         }
 
     public:
-        explicit Iterator(shared_ptr<Node> curr = nullptr, Traversal type = Traversal::InOrder) : _current(curr),
+        explicit Iterator(shared_ptr<Node> curr = nullptr, Traversal type = Traversal::BFS) : _current(curr),
             _traversal(
                 type) {
 
@@ -332,7 +333,7 @@ public:
                 case Traversal::PreOrder:
                     break;
                 case Traversal::DFS:
-                    goDownLeft();
+                    _stack.push(_current);
                     break;
                 case Traversal::BFS:
                     _queue.push(_current);
@@ -377,6 +378,15 @@ public:
 
     };
 
+    std::shared_ptr<Node> find(std::shared_ptr<Node> node, T value) {
+        if (!node) return nullptr;
+        if (node->_val == value) return node;
+        for (auto &child : node->_children) {
+            auto found = find(child, value);
+            if (found) return found;
+        }
+        return nullptr;
+    }
     void copySubTreeOf(shared_ptr<Node> node) {
 
         if (node->_left_most) {
@@ -543,7 +553,7 @@ public:
     }
 
     Iterator begin() const {
-        auto itr = Iterator{_root, Traversal::InOrder};
+        auto itr = Iterator{_root, Traversal::BFS};
         return itr;
     }
 
