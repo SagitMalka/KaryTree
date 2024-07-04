@@ -461,11 +461,11 @@ public:
     Tree<T, k> &add_sub_node(T parent_val, T child_val) {
         auto parent = getNode(parent_val);
         if (parent == nullptr) {
-            throw invalid_argument("Parent not found");
+            throw invalid_argument("Parent node not found");
         }
         int kids = parent->_children_count;
         if (kids == k) {
-            throw invalid_argument("max kids. cant");
+            throw invalid_argument("Maximum children exceeded");
         }
         //parent->_children[parent->number_of_children] = make_shared<Node>(child_val);
         weak_ptr<Node> weakPtr = parent;

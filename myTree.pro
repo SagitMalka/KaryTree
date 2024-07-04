@@ -11,10 +11,12 @@ CONFIG += c++17
 SOURCES += \
     Complex.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    test_main.cpp
 
 HEADERS += \
     Complex.hpp \
+    doctest.h \
     mainwindow.hpp \
     tree.hpp
 
