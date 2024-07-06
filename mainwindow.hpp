@@ -1,5 +1,7 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+
+// sagitmalka10@gmail.com
+
+#pragma once
 
 #include <QMainWindow>
 #include <QPainter>
@@ -22,7 +24,6 @@ public:
     Tree<Complex, 2> tree;
 
 protected:
-    // template <typename T, int k>
     void paintEvent(QPaintEvent *event);
 
 private:
@@ -34,4 +35,3 @@ private:
     void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 2>::Node>, int x, int y, int xOffset, int yOffset);
 };
 
-#endif // MAINWINDOW_H

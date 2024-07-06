@@ -1,3 +1,4 @@
+// sagitmalka10@gmail.com
 #include "mainwindow.hpp"
 #include <iostream>
 #include <QApplication>
