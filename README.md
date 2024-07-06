@@ -32,6 +32,8 @@ std::cout << tree << std::endl;
 ```ruby
 tree.myHeap();
 ```
+![p](https://github.com/SagitMalka/KaryTree/assets/118733667/cd950530-44bd-4f2e-aa74-173ed42199da)
+
 
 ## License
 MIT
