@@ -76,23 +76,9 @@ public:
         queue<shared_ptr<Node>> _queue;
         std::stack<shared_ptr<Node>> _stack;
         unordered_set<shared_ptr<Node>> _visitStack;
-        //
-        //            void traverseLeft(std::shared_ptr<Node> node) {
-        //                while (node) {
-        //                    stack.push(node);
-        //                    node = node->_left_most;
-        //                }
-        //                if (!stack.empty()) {
-        //                    _current = stack.front();
-        //                    stack.pop();
-        //                } else {
-        //                    _current = nullptr;
-        //                }
-        //            }
 
         bool isOnlyChild() const {
             return !isRoot() && _current->_parent.lock()->_children_count == 1;
-            //return !isRoot() && isRightMost() && isLeftMost();
         }
 
         bool isRoot() const {
@@ -217,7 +203,6 @@ public:
             while (!_stack.empty()) {
                 _current = _stack.top();
 
-                // Check if all children are visited
                 bool allChildrenVisited = true;
                 for (int i = k - 1; i >= 0; --i) {
                     if (_current->_children[i] && _visitStack.find(_current->_children[i]) == _visitStack.end()) {
@@ -467,16 +452,10 @@ public:
         if (kids == k) {
             throw invalid_argument("Maximum children exceeded");
         }
-        //parent->_children[parent->number_of_children] = make_shared<Node>(child_val);
         weak_ptr<Node> weakPtr = parent;
         auto new_node = make_shared<Node>(child_val);
         parent->_children[kids] = new_node;
         new_node->_parent = weakPtr;
-        //parent->_children.push_back(make_shared<Node<T>>(child_val));
-        //parent->_children[kids] = make_shared<Node<T>>(child_val);
-
-
-        //parent->_children[kids]->_parent = weakPtr;
 
         parent->_children_count++;
 
@@ -484,7 +463,6 @@ public:
         parent->_children[kids]->_val = child_val;
         if (kids == 0) {
             parent->_left_most = parent->_children[kids];
-            //parent->_right_most = parent->_children[kids];
         } else if (kids == k - 1) {
             parent->_right_most = parent->_children[kids];
         }
@@ -503,7 +481,6 @@ public:
         inOrderTraversal(_root, elements);
         std::make_heap(elements.begin(), elements.end(), std::greater<T>());
 
-        // Reconstruct the tree from heap-ordered elements
         rebuildFromHeap(_root, elements);
     }
 
