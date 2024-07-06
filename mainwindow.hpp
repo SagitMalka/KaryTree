@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Tree<Complex, 5> tree;
+    Tree<Complex, 2> tree;
 
 protected:
     // template <typename T, int k>
@@ -31,9 +31,7 @@ private:
 
     template<typename T>
     QString toQString(const T& value);
-
-    // template <typename T, int k>
-    void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 5>::Node>, int x, int y, int xOffset, int yOffset);
+    void drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 2>::Node>, int x, int y, int xOffset, int yOffset);
 };
 
 #endif // MAINWINDOW_H

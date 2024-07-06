@@ -575,55 +575,59 @@ public:
         rebuildFromHeap(node->_right_most, elements);
     }
 
-    static ostream &buildTreeStream(const std::string &prefix, shared_ptr<Node> node, bool isLeft, ostream &treeStream) {
-        if (node != nullptr) {
-            treeStream << prefix;
+    // static ostream &buildTreeStream(const std::string &prefix, shared_ptr<Node> node, bool isLeft, ostream &treeStream) {
+    //     if (node != nullptr) {
+    //         treeStream << prefix;
 
-            string yellowLeft = "\x1B[93m├──\033[0m";
-            string blueRight = "\x1B[34m└──\033[0m";
-            treeStream << (isLeft ? yellowLeft : blueRight);
+    //         string yellowLeft = "\x1B[93m├──\033[0m";
+    //         string blueRight = "\x1B[34m└──\033[0m";
+    //         treeStream << (isLeft ? yellowLeft : blueRight);
 
-            treeStream << "\033[3;43;30m(" << node->_val << ")\033[0m" << endl;
+    //         treeStream << "\033[3;43;30m(" << node->_val << ")\033[0m" << endl;
 
-            string yellowBranch = "\x1B[93m│   \033[0m";
-            string blueBranch = "\x1B[34m│   \033[0m";
-            buildTreeStream(prefix + (isLeft ? yellowBranch : "    "), node->_left_most, true, treeStream);
-            buildTreeStream(prefix + (isLeft ? blueBranch : "    "), node->_right_most, false, treeStream);
-        }
-        return treeStream;
-    }
+    //         string yellowBranch = "\x1B[93m│   \033[0m";
+    //         string blueBranch = "\x1B[34m│   \033[0m";
+    //         buildTreeStream(prefix + (isLeft ? yellowBranch : "    "), node->_left_most, true, treeStream);
+    //         buildTreeStream(prefix + (isLeft ? blueBranch : "    "), node->_right_most, false, treeStream);
+    //     }
+    //     return treeStream;
+    // }
 
-    static ostream &buildTreeStream(shared_ptr<Node> node, ostream &treeStream) {
-        return buildTreeStream("", node, false, treeStream) << endl;
-    }
+    // static ostream &buildTreeStream(shared_ptr<Node> node, ostream &treeStream) {
+    //     return buildTreeStream("", node, false, treeStream) << endl;
+    // }
 
-    friend ostream &operator<<(ostream &out, const Tree<T, k> &BT) {
+    friend ostream &operator<<(ostream &out, const Tree<T, k> &tree) {
         out << endl;
 
-        buildTreeStream(BT._root, out);
+        // buildTreeStream(tree._root, out);
 
         out << "                  ----BINARY TREE----" << endl;
         if(k == 2){
             out << endl << "* Preorder  -> ";
 
-            for (auto it = BT.begin_pre_order(); it != BT.end_pre_order(); ++it) {
+            for (auto it = tree.begin_pre_order(); it != tree.end_pre_order(); ++it) {
                 out << (*it) << " ";
             }
             out << endl << "* Inorder   -> ";
-            for (auto it = BT.begin_in_order(); it != BT.end_in_order(); ++it) {
+            for (auto it = tree.begin_in_order(); it != tree.end_in_order(); ++it) {
                 out << (*it) << " ";
             }
             out << endl << "* Postorder -> ";
-            for (auto it = BT.begin_post_order(); it != BT.end_post_order(); ++it) {
+            for (auto it = tree.begin_post_order(); it != tree.end_post_order(); ++it) {
                 out << (*it) << " ";
             }
         }
         out << endl << "* Bfs -> ";
-        for (auto it = BT.begin_bfs_scan(); it != BT.end_bfs_scan(); ++it) {
+        auto it = tree.begin_bfs_scan();
+        ++it;
+        for (; it != tree.end_bfs_scan(); ++it) {
             out << (*it) << " ";
         }
         out << endl << "* Dfs -> ";
-        for (auto it = BT.begin_dfs_scan(); it != BT.end_dfs_scan(); ++it) {
+        it = tree.begin_dfs_scan();
+        ++it;
+        for (; it != tree.end_dfs_scan(); ++it) {
             out << (*it) << " ";
         }
         return out;

@@ -46,15 +46,14 @@ void MainWindow::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event);
 
     QPainter painter(this);
-    int xOffset = width() / (2*tree.getKSize());
+    int xOffset = 5 + width() / (2*tree.getKSize());
     int yOffset = 50;
-
     if (tree.getRoot() != nullptr) {
         drawNode(painter, tree.getRoot(), width() / 2, yOffset, xOffset, yOffset);
     }
 }
-// template <typename T, int k>
-void MainWindow::drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 5>::Node>node, int x, int y, int xOffset, int yOffset) {
+
+void MainWindow::drawNode(QPainter &painter, std::shared_ptr<Tree<Complex, 2>::Node>node, int x, int y, int xOffset, int yOffset) {
     if (node == nullptr) {
         return;
     }
