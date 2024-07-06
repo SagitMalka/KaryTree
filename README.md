@@ -32,8 +32,10 @@ std::cout << tree << std::endl;
 ```ruby
 tree.myHeap();
 ```
-![p](https://github.com/SagitMalka/KaryTree/assets/118733667/cd950530-44bd-4f2e-aa74-173ed42199da)
-
+#### Before myHeap:
+![a](https://github.com/SagitMalka/KaryTree/assets/118733667/edf2f723-07d9-4b80-8f0c-e34ba9f89d6f)
+#### After myHeap:
+![b](https://github.com/SagitMalka/KaryTree/assets/118733667/d8bb4901-939d-47cd-bd19-dc71714ac028)
 
 ## License
 MIT
